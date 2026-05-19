@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Blue Wither Skull Nuke Calculator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap');
+:root{--bg:#0a0c0f;--panel:#0f1318;--border:#1a2230;--green:#00ff88;--blue:#4da6ff;--red:#ff4466;--yellow:#ffcc00;--text:#b0c8e0;--dim:#3a5060}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOPBAR */
+#topbar{background:#0b0e13;border-bottom:2px solid var(--border);padding:0 14px;height:56px;display:flex;align-items:center;gap:22px;flex-shrink:0;overflow-x:auto;white-space:nowrap}
+.title{font-family:'Orbitron',sans-serif;font-size:15px;color:var(--green);letter-spacing:3px;flex-shrink:0}
+.pg{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.pl{color:var(--dim);font-size:12px;letter-spacing:1px}
+.pv{color:var(--green);font-size:17px;font-weight:bold}
+input[type=range]{-webkit-appearance:none;width:100px;height:4px;background:#1a2230;border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--green);cursor:pointer}
+input.ti{background:#0b0e13;border:1px solid #1a2230;color:var(--yellow);font-family:'Share Tech Mono',monospace;font-size:16px;font-weight:bold;width:80px;padding:5px 6px;text-align:center;outline:none}
+input.ti:focus{border-color:var(--green)}
+.sep{width:1px;height:28px;background:var(--border);flex-shrink:0}
+#btnVec{font-family:'Orbitron',sans-serif;font-size:10px;background:#0a1a2a;border:1px solid var(--blue);color:var(--blue);padding:5px 12px;cursor:pointer;letter-spacing:1px;transition:all .2s;flex-shrink:0}
+#btnVec:hover{background:var(--blue);color:#000}
+
+/* MAIN */
+#main{display:flex;flex:1;overflow:hidden}
+#lbl{width:24px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:10px;writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:2px;flex-shrink:0}
+#cw{flex:1;position:relative;overflow:hidden}
+canvas{display:block;cursor:crosshair}
+#ci{position:absolute;top:8px;left:8px;background:rgba(0,15,30,.9);border:1px solid var(--border);padding:3px 10px;color:var(--green);font-size:11px;pointer-events:none}
+#oi{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(0,15,30,.88);border:1px solid #1a2230;padding:3px 12px;display:flex;align-items:center;gap:8px;font-size:11px;pointer-events:none}
+.od{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block}
+#eq{position:absolute;top:8px;right:8px;background:rgba(5,12,22,.93);border:1px solid var(--border);padding:10px 14px;font-size:11px;line-height:2;pointer-events:none}
+.em{color:var(--text)}.es{color:var(--dim);font-size:10px}
+#pc{position:absolute;bottom:8px;right:8px;color:var(--dim);font-size:11px;pointer-events:none}
+#hint{position:absolute;bottom:8px;left:8px;color:var(--dim);font-size:10px;pointer-events:none}
+#vecstatus{position:absolute;bottom:28px;left:8px;color:var(--dim);font-size:9px;pointer-events:none}
+/* VECTEURS TAB */
+#vecTab{display:none;flex:1;overflow-y:auto;background:var(--bg);padding:28px;gap:24px;flex-wrap:wrap;justify-content:center}
+#vecTab.active{display:flex}
+#btnVec.active{background:var(--blue);color:#000;border-color:var(--blue)}
+.vcard{background:var(--panel);border:1px solid var(--border);padding:22px;min-width:300px;max-width:400px;flex:1}
+.vcard-title{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:9px}
+.vrow{margin-bottom:18px}
+.vname{color:var(--blue);font-size:14px;font-weight:bold;margin-bottom:7px}
+.vname small{color:var(--dim);font-size:10px;font-weight:normal;margin-left:6px}
+.vinputs{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.vinpw{display:flex;flex-direction:column;gap:3px}
+.vinplbl{color:var(--dim);font-size:10px}
+input.vi{background:#080c10;border:1px solid var(--border);color:var(--yellow);font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:bold;width:100%;padding:6px 8px;text-align:right;outline:none}
+input.vi:focus{border-color:var(--blue)}
+.psrow{background:#080c10;border:1px solid var(--border);padding:9px 12px;margin-top:6px;display:flex;justify-content:space-between}
+.pslbl{color:var(--dim);font-size:11px}.psval{color:var(--yellow);font-size:12px;font-weight:bold}
+.vbtns{display:flex;gap:10px;margin-top:18px}
+.vbtn{font-family:'Orbitron',sans-serif;font-size:10px;padding:8px 16px;cursor:pointer;letter-spacing:1px;border:none;transition:all .2s;flex:1}
+.vbtn.apply{background:#003322;border:1px solid var(--green);color:var(--green)}
+.vbtn.apply:hover{background:var(--green);color:#000}
+.vbtn.reset{background:#1a0a0a;border:1px solid var(--red);color:var(--red)}
+.vbtn.reset:hover{background:var(--red);color:#000}
+#vsaved{text-align:center;padding:8px;font-size:12px;color:var(--dim);min-height:28px}
+#vsaved.ok{color:var(--green)}
+#vecstatus{position:absolute;bottom:28px;left:8px;color:var(--dim);font-size:9px;pointer-events:none}
+
+/* RIGHT PANEL */
+#rp{width:290px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+#rp::-webkit-scrollbar{width:3px}
+#rp::-webkit-scrollbar-thumb{background:var(--border)}
+.sec{border-bottom:1px solid var(--border);padding:11px 13px}
+.st{font-family:'Orbitron',sans-serif;font-size:8px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.pbg{background:#111820;height:6px;border-radius:3px;overflow:hidden;margin:4px 0}
+.pbf{height:100%;border-radius:3px;transition:width .3s}
+
+/* ===== MOBILE ===== */
+#menuBtn{display:none;font-family:'Orbitron',sans-serif;font-size:11px;background:#0a1a2a;border:1px solid var(--green);color:var(--green);padding:6px 12px;cursor:pointer;flex-shrink:0}
+#settingsDrawer{display:none;position:fixed;bottom:0;left:0;right:0;background:#0b0e13;border-top:2px solid var(--border);z-index:100;padding:14px 16px;max-height:70vh;overflow-y:auto}
+#settingsDrawer.open{display:block}
+#settingsDrawer .pg{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+#settingsDrawer .pl{color:var(--dim);font-size:13px}
+#settingsDrawer input.ti{font-size:17px;width:100px;padding:7px 8px}
+#settingsDrawer input[type=range]{width:130px}
+#drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+#drawerOverlay.open{display:block}
+
+/* Mobile right panel: full-width bottom sheet */
+@media(max-width:700px){
+  #menuBtn{display:block}
+  #topbar .pg,.topbar .sep,#topbar .sep{display:none}
+  #topbar .title{font-size:13px}
+  #btnVec{font-size:10px;padding:4px 8px}
+  #main{flex-direction:column}
+  #lbl{display:none}
+  #rp{width:100%;max-height:42vh;border-left:none;border-top:2px solid var(--border)}
+  #cw{flex:1;min-height:0}
+  #eq{display:none}
+  #hint{display:none}
+  #vecstatus{display:none}
+  .vcard{min-width:unset}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <span class="title" style="font-size:12px;letter-spacing:2px">BLUE WITHER SKULL</span><span style="font-family:'Orbitron',sans-serif;font-size:10px;color:var(--dim);letter-spacing:1px;flex-shrink:0">NUKE CALC</span>
+
+  <div class="pg">
+    <span class="pl">N</span>
+    <input type="range" id="slN" min="1" max="10" value="10" oninput="nVal=+this.value;document.getElementById('dN').textContent=nVal;rebuild()">
+    <span class="pv" id="dN">10</span>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="pg"><span class="pl">TOLERANCE</span><input type="number" class="ti" id="inpTol" value="0.10" step="0.05" min="0.01" oninput="rebuild()"></div>
+  <div class="pg"><span class="pl">α</span><span class="pv" style="color:var(--blue);font-size:16px">0.73</span></div>
+  <div class="pg"><span class="pl">NUKE SIZE X</span><input type="number" class="ti" id="inpOffX" value="0" step="1" min="0" oninput="rebuild()"></div>
+  <div class="pg"><span class="pl">NUKE SIZE Z</span><input type="number" class="ti" id="inpOffY" value="0" step="1" min="0" oninput="rebuild()"></div>
+
+  <div class="sep"></div>
+
+  <div class="pg"><span class="pl">ORIGINE X</span><input type="number" class="ti" id="inpOX" value="0" step="0.01" oninput="onOriginChange()"></div>
+  <div class="pg"><span class="pl">ORIGINE Z</span><input type="number" class="ti" id="inpOZ" value="0" step="0.01" oninput="onOriginChange()"></div>
+
+  <div class="sep"></div>
+
+  <div class="pg"><span class="pl">K MAX</span><input type="number" class="ti" id="inpKmax" value="5000" step="100" min="100" oninput="rebuild()"></div>
+
+  <div class="sep"></div>
+
+  <button id="btnVec" onclick="toggleTab()">⚙ VECTORS</button>
+  <button id="menuBtn" onclick="openDrawer()">☰ PARAMS</button>
+</div>
+
+<!-- MOBILE SETTINGS DRAWER -->
+<div id="drawerOverlay" onclick="closeDrawer()"></div>
+<div id="settingsDrawer">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-family:'Orbitron',sans-serif;font-size:11px;color:var(--green);letter-spacing:2px">PARAMETERS</span>
+    <button onclick="closeDrawer()" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button>
+  </div>
+  <div class="pg"><span class="pl">N</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <input type="range" id="slNm" min="1" max="10" value="10" oninput="nVal=+this.value;document.getElementById('dN').textContent=nVal;document.getElementById('slN').value=nVal;rebuild()">
+      <span class="pv" style="font-size:17px" id="dNm">10</span>
+    </div>
+  </div>
+  <div class="pg"><span class="pl">TOLERANCE</span><input type="number" class="ti" id="inpTolm" value="0.10" step="0.05" min="0.01" oninput="document.getElementById('inpTol').value=this.value;rebuild()"></div>
+  <div class="pg"><span class="pl">α</span><span class="pv" style="color:var(--blue);font-size:17px">0.73</span></div>
+  <div class="pg"><span class="pl">NUKE SIZE X</span><input type="number" class="ti" id="inpOffXm" value="0" step="1" min="0" oninput="document.getElementById('inpOffX').value=this.value;rebuild()"></div>
+  <div class="pg"><span class="pl">NUKE SIZE Z</span><input type="number" class="ti" id="inpOffYm" value="0" step="1" min="0" oninput="document.getElementById('inpOffY').value=this.value;rebuild()"></div>
+  <div class="pg"><span class="pl">ORIGIN X</span><input type="number" class="ti" id="inpOXm" value="0" step="0.01" oninput="document.getElementById('inpOX').value=this.value;onOriginChange()"></div>
+  <div class="pg"><span class="pl">ORIGIN Z</span><input type="number" class="ti" id="inpOZm" value="0" step="0.01" oninput="document.getElementById('inpOZ').value=this.value;onOriginChange()"></div>
+  <div class="pg"><span class="pl">K MAX</span><input type="number" class="ti" id="inpKmaxm" value="5000" step="100" min="100" oninput="document.getElementById('inpKmax').value=this.value;rebuild()"></div>
+</div>
+
+<div id="main">
+  <div id="lbl">↑ LHS[1]</div>
+  <div id="cw">
+    <canvas id="cv"></canvas>
+    <div id="ci">Cursor: 0 , 0</div>
+    <div id="oi"><span class="od"></span>Origin: X=<span id="oX2">0</span> &nbsp;Z=<span id="oZ2">0</span></div>
+    <div id="eq">
+      <div class="em">α·(M + B·W₁ + A·W₂ + 0.14·[nukeSizeX/2, nukeSizeZ/2])</div>
+      <div class="em">&nbsp;&nbsp;= C·T₁ + D·T₂</div>
+      <div class="es" style="margin-top:3px">Plot: LHS + Origin · A,B,C,D/n ≥ 16</div>
+    </div>
+    <div id="pc">0 points</div>
+    <div id="vecstatus"></div>
+    <div id="hint">Scroll: zoom · Drag: pan · Tap: select</div>
+  </div>
+
+  <div id="rp">
+    <div class="sec">
+      <div class="st">Selected Point</div>
+      <div style="color:var(--dim);font-size:10px;margin-bottom:8px">Coordinates LHS + Origin</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <div style="flex:1;background:#080c10;border:1px solid var(--border);padding:7px;text-align:center">
+          <div style="color:var(--dim);font-size:10px">x</div>
+          <div style="color:var(--yellow);font-size:15px;font-weight:bold" id="coordX">—</div>
+        </div>
+        <div style="flex:1;background:#080c10;border:1px solid var(--border);padding:7px;text-align:center">
+          <div style="color:var(--dim);font-size:10px">y</div>
+          <div style="color:var(--yellow);font-size:15px;font-weight:bold" id="coordY">—</div>
+        </div>
+      </div>
+
+      <div class="st">Integrity Error</div>
+      <div class="pbg"><div class="pbf" id="pbar" style="width:0%;background:var(--red)"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+        <span style="color:var(--dim);font-size:10px">proximity to integer multiple</span>
+        <span style="color:var(--green);font-weight:bold;font-size:14px" id="pval">—</span>
+      </div>
+
+      <div class="st">Coefficients — value &amp; base 64</div>
+      <div id="coefBlocks"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VECTEURS TAB (hidden by default) -->
+<div id="vecTab">
+  <div class="vcard">
+    <div class="vcard-title">Input Vectors</div>
+    <div class="vrow">
+      <div class="vname">M <small>base vector</small></div>
+      <div class="vinputs">
+        <div class="vinpw"><div class="vinplbl">[0]</div><input class="vi" id="M0" type="number" value="-1.36728323977" step="0.0001" oninput="updatePS()"></div>
+        <div class="vinpw"><div class="vinplbl">[1]</div><input class="vi" id="M1" type="number" value="-0.0761753739" step="0.0001" oninput="updatePS()"></div>
+      </div>
+    </div>
+    <div class="vrow">
+      <div class="vname">W₁ <small>free vector 1</small></div>
+      <div class="vinputs">
+        <div class="vinpw"><div class="vinplbl">[0]</div><input class="vi" id="W10" type="number" value="0.2789573357277725" step="0.0001" oninput="updatePS()"></div>
+        <div class="vinpw"><div class="vinplbl">[1]</div><input class="vi" id="W11" type="number" value="-0.7669543213051008" step="0.0001" oninput="updatePS()"></div>
+      </div>
+    </div>
+    <div class="vrow">
+      <div class="vname">W₂ <small>free vector 2</small></div>
+      <div class="vinputs">
+        <div class="vinpw"><div class="vinplbl">[0]</div><input class="vi" id="W20" type="number" value="-0.7669543213051008" step="0.0001" oninput="updatePS()"></div>
+        <div class="vinpw"><div class="vinplbl">[1]</div><input class="vi" id="W21" type="number" value="0.2789573357277725" step="0.0001" oninput="updatePS()"></div>
+      </div>
+    </div>
+    <div class="vbtns">
+      <button class="vbtn reset" onclick="resetVecDefaults()">↺ RESET</button>
+      <button class="vbtn apply" onclick="applyVectors()">✓ APPLIQUER</button>
+    </div>
+    <div id="vsaved"></div>
+  </div>
+
+  <div class="vcard">
+    <div class="vcard-title">Target Vectors</div>
+    <div class="vrow">
+      <div class="vname">T₁ <small>target vector 1</small></div>
+      <div class="vinputs">
+        <div class="vinpw"><div class="vinplbl">[0]</div><input class="vi" id="T10" type="number" value="-0.06563918647088031" step="0.0001" oninput="updatePS()"></div>
+        <div class="vinpw"><div class="vinplbl">[1]</div><input class="vi" id="T11" type="number" value="-0.74329444961490685" step="0.0001" oninput="updatePS()"></div>
+      </div>
+    </div>
+    <div class="vrow">
+      <div class="vname">T₂ <small>target vector 2</small></div>
+      <div class="vinputs">
+        <div class="vinpw"><div class="vinplbl">[0]</div><input class="vi" id="T20" type="number" value="-0.7432944510720886" step="0.0001" oninput="updatePS()"></div>
+        <div class="vinpw"><div class="vinplbl">[1]</div><input class="vi" id="T21" type="number" value="-0.06563919427594879" step="0.0001" oninput="updatePS()"></div>
+      </div>
+    </div>
+    <div class="psrow"><span class="pslbl">PS(T₁,W₁)</span><span class="psval" id="ps1">—</span></div>
+    <div class="psrow" style="margin-top:4px"><span class="pslbl">PS(T₂,W₂)</span><span class="psval" id="ps2">—</span></div>
+    <div class="psrow" style="margin-top:4px"><span class="pslbl">det(system)</span><span class="psval" id="detVal">—</span></div>
+    <div style="background:#080c10;border:1px solid var(--border);padding:12px;margin-top:10px;font-size:10px;line-height:1.9;color:var(--dim)">
+      <span style="color:var(--text)">Equation:</span><br>
+      α·(M + B·W₁ + A·W₂ + 0.14·offset) = C·T₁ + D·T₂<br>
+      <span style="color:var(--red)">det ≈ 0 → singular system, no points.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== VECTEURS — lus depuis les inputs de l'onglet =====
+let M  = [-1.36728323977,      -0.0761753739      ];
+let T1 = [-0.06563918647088031,-0.74329444961490685];
+let T2 = [-0.7432944510720886, -0.06563919427594879];
+let W1 = [ 0.2789573357277725, -0.7669543213051008 ];
+let W2 = [-0.7669543213051008,  0.2789573357277725 ];
+
+function toggleTab(){
+  const tab=document.getElementById('vecTab');
+  const main=document.getElementById('main');
+  const btn=document.getElementById('btnVec');
+  const isOpen=tab.classList.contains('active');
+  tab.classList.toggle('active',!isOpen);
+  main.style.display=isOpen?'flex':'none';
+  btn.classList.toggle('active',!isOpen);
+  btn.textContent=isOpen?'⚙ VECTORS':'✕ CLOSE';
+  if(!isOpen) updatePS();
+}
+
+function applyVectors(){
+  M  =[+document.getElementById('M0').value,  +document.getElementById('M1').value];
+  T1 =[+document.getElementById('T10').value, +document.getElementById('T11').value];
+  T2 =[+document.getElementById('T20').value, +document.getElementById('T21').value];
+  W1 =[+document.getElementById('W10').value, +document.getElementById('W11').value];
+  W2 =[+document.getElementById('W20').value, +document.getElementById('W21').value];
+  const st=document.getElementById('vsaved');
+  st.textContent='✓ Applied — recalculating...'; st.className='ok';
+  setTimeout(()=>{rebuild();st.textContent='✓ Done.';},50);
+}
+
+function resetVecDefaults(){
+  document.getElementById('M0').value=-1.36728323977;
+  document.getElementById('M1').value=-0.0761753739;
+  document.getElementById('T10').value=-0.06563918647088031;
+  document.getElementById('T11').value=-0.74329444961490685;
+  document.getElementById('T20').value=-0.7432944510720886;
+  document.getElementById('T21').value=-0.06563919427594879;
+  document.getElementById('W10').value=0.2789573357277725;
+  document.getElementById('W11').value=-0.7669543213051008;
+  document.getElementById('W20').value=-0.7669543213051008;
+  document.getElementById('W21').value=0.2789573357277725;
+  updatePS();
+}
+
+function updatePS(){
+  const w1=[+document.getElementById('W10').value,+document.getElementById('W11').value];
+  const w2=[+document.getElementById('W20').value,+document.getElementById('W21').value];
+  const t1=[+document.getElementById('T10').value,+document.getElementById('T11').value];
+  const t2=[+document.getElementById('T20').value,+document.getElementById('T21').value];
+  const ps1v=t1[0]*w1[0]+t1[1]*w1[1];
+  const ps2v=t2[0]*w2[0]+t2[1]*w2[1];
+  const a=0.73;
+  const det=(a*w1[0])*(-t2[1])-(-t2[0])*(a*w1[1]);
+  document.getElementById('ps1').textContent=ps1v.toFixed(6);
+  document.getElementById('ps2').textContent=ps2v.toFixed(6);
+  const dEl=document.getElementById('detVal');
+  dEl.textContent=det.toFixed(8);
+  dEl.style.color=Math.abs(det)<1e-6?'var(--red)':'var(--green)';
+}
+
+// ===== STATE =====
+let alpha=0.73, tolerance=0.10, nVal=10, nukeSizeX=0, nukeSizeZ=0;
+let originX=0, originZ=0;
+let allPoints=[], selected=null;
+
+const cv=document.getElementById('cv');
+const ctx=cv.getContext('2d');
+let CW=0,CH=0,camX=0,camY=0,ppu=100;
+let isPanning=false,panStartPx=null,panStartCam=null,didPan=false;
+
+function resize(){
+  const w=document.getElementById('cw');
+  CW=w.clientWidth; CH=w.clientHeight;
+  cv.width=CW; cv.height=CH; draw();
+}
+
+// ===== MATH =====
+const vadd=(a,b)=>[a[0]+b[0],a[1]+b[1]];
+const vsub=(a,b)=>[a[0]-b[0],a[1]-b[1]];
+const vsc=(s,v)=>[s*v[0],s*v[1]];
+const vnorm=v=>Math.hypot(v[0],v[1]);
+
+function solvePoint(A,C){
+  const off=[0.14*nukeSizeX/2, 0.14*nukeSizeZ/2];
+  const base=vadd(vadd(M,vsc(A,W2)),off);
+  const r0=C*T1[0]-alpha*base[0], r1=C*T1[1]-alpha*base[1];
+  const a00=alpha*W1[0],a01=-T2[0],a10=alpha*W1[1],a11=-T2[1];
+  const det=a00*a11-a01*a10;
+  if(Math.abs(det)<1e-12) return null;
+  return {A,B:(r0*a11-a01*r1)/det,C,D:(a00*r1-r0*a10)/det,base};
+}
+function calcLHS(sol){ return vsc(alpha,vadd(sol.base,vsc(sol.B,W1))); }
+function calcRHS(sol){ return vadd(vsc(sol.C,T1),vsc(sol.D,T2)); }
+
+function rebuild(){
+  alpha    = 0.73; // fixé
+  tolerance=+document.getElementById('inpTol').value;
+  nukeSizeX = +document.getElementById('inpOffX').value;
+  nukeSizeZ = +document.getElementById('inpOffY').value;
+  nVal     =+document.getElementById('slN').value;
+  document.getElementById('dN').textContent=nVal;
+  originX  =+document.getElementById('inpOX').value;
+  originZ  =+document.getElementById('inpOZ').value;
+  const KMAX=+document.getElementById('inpKmax').value;
+  const kMin=16, kMax=Math.max(kMin+1,Math.floor(KMAX/nVal));
+
+  allPoints=[];
+  for(let kA=kMin;kA<=kMax;kA++){
+    const A=kA*nVal;
+    for(let kC=kMin;kC<=kMax;kC++){
+      const C=kC*nVal;
+      const sol=solvePoint(A,C); if(!sol) continue;
+      const {B,D}=sol;
+      const fB=B/nVal, fD=D/nVal;
+      if(fB<kMin||fD<kMin) continue;
+      const eB=Math.abs(fB-Math.round(fB)), eD=Math.abs(fD-Math.round(fD));
+      if(eB>tolerance||eD>tolerance) continue;
+      const lhs=calcLHS(sol), rhs=calcRHS(sol);
+      const eMax=Math.max(eB,eD);
+      allPoints.push({A,B,C,D,kA,kB:Math.round(fB),kC,kD:Math.round(fD),
+        lhsRaw:lhs,rhsRaw:rhs,lhsRhsDiff:vnorm(vsub(lhs,rhs)),
+        eB,eD,eMax,prec:Math.max(0,1-eMax/0.14),sol});
+    }
+  }
+  document.getElementById('pc').textContent=allPoints.length+' points';
+  selected=null;
+  applyOrigin(true);
+}
+
+function onOriginChange(){
+  originX=+document.getElementById('inpOX').value;
+  originZ=+document.getElementById('inpOZ').value;
+  document.getElementById('oX2').textContent=fmtN(originX);
+  document.getElementById('oZ2').textContent=fmtN(originZ);
+  for(const p of allPoints){ p.plotX=p.lhsRaw[0]+originX; p.plotY=p.lhsRaw[1]+originZ; }
+  // Recenter camera on red dot (originX, originZ)
+  camX=originX; camY=originZ;
+  draw();
+}
+
+function applyOrigin(fit){
+  for(const p of allPoints){ p.plotX=p.lhsRaw[0]+originX; p.plotY=p.lhsRaw[1]+originZ; }
+  if(fit && allPoints.length>0){
+    let minX=1e18,maxX=-1e18,minY=1e18,maxY=-1e18;
+    for(const p of allPoints){
+      if(p.plotX<minX)minX=p.plotX; if(p.plotX>maxX)maxX=p.plotX;
+      if(p.plotY<minY)minY=p.plotY; if(p.plotY>maxY)maxY=p.plotY;
+    }
+    ppu=Math.min(CW/(Math.max(maxX-minX,.001)*1.35),CH/(Math.max(maxY-minY,.001)*1.35));
+    camX=(minX+maxX)/2; camY=(minY+maxY)/2;
+  } else if(fit){ camX=0;camY=0;ppu=200; }
+  draw();
+}
+
+// ===== COORDS =====
+function w2p(wx,wy){return[CW/2+(wx-camX)*ppu,CH/2-(wy-camY)*ppu];}
+function p2w(px,py){return[(px-CW/2)/ppu+camX,-(py-CH/2)/ppu+camY];}
+function niceStep(s,t){if(s<=0||!isFinite(s))return 1;const r=s/t,m=Math.pow(10,Math.floor(Math.log10(r))),n=r/m;return m*(n<1.5?1:n<3.5?2:n<7.5?5:10);}
+function fmtN(n){if(!isFinite(n))return'?';const a=Math.abs(n);return a>=1000?n.toFixed(0):a>=10?n.toFixed(1):a>=1?n.toFixed(3):n.toFixed(4);}
+
+// ===== DRAW =====
+function draw(){
+  ctx.clearRect(0,0,CW,CH);
+  ctx.fillStyle='#0a0c0f'; ctx.fillRect(0,0,CW,CH);
+  drawGrid(); drawPoints(); drawOriginDot(); drawScaleBar();
+  ctx.fillStyle='#3a5060'; ctx.font='11px Share Tech Mono';
+  const[,ay]=w2p(0,0);
+  ctx.fillText('LHS[0] →',CW-84,Math.min(Math.max(ay-7,12),CH-7));
+}
+
+function drawScaleBar(){
+  // Pick a nice round world-unit length for the scale bar
+  const targetPx=120;
+  const worldLen=targetPx/ppu;
+  // Round to nice number
+  const mag=Math.pow(10,Math.floor(Math.log10(worldLen)));
+  const n=worldLen/mag;
+  const nice=mag*(n<1.5?1:n<3.5?2:n<7.5?5:10);
+  const barPx=nice*ppu;
+
+  const x=16, y=CH-20, h=5;
+  // Background
+  ctx.fillStyle='rgba(0,10,20,0.7)';
+  ctx.fillRect(x-6, y-16, barPx+18, 28);
+  // Bar segments (alternating)
+  const segs=4;
+  const segW=barPx/segs;
+  for(let i=0;i<segs;i++){
+    ctx.fillStyle=i%2===0?'#b0c8e0':'#3a5060';
+    ctx.fillRect(x+i*segW, y-h/2, segW, h);
+  }
+  // Border
+  ctx.strokeStyle='#b0c8e0'; ctx.lineWidth=1;
+  ctx.strokeRect(x, y-h/2, barPx, h);
+  // Ticks and labels
+  ctx.fillStyle='#b0c8e0'; ctx.font='9px Share Tech Mono'; ctx.textAlign='center';
+  ctx.fillText('0', x, y-h/2-3);
+  ctx.fillText(fmtN(nice/2), x+barPx/2, y-h/2-3);
+  ctx.fillText(fmtN(nice), x+barPx, y-h/2-3);
+  ctx.textAlign='left';
+}
+
+function drawGrid(){
+  const[wL,wT]=p2w(0,0),[wR,wB]=p2w(CW,CH);
+  const sX=niceStep(wR-wL,8),sY=niceStep(wT-wB,6);
+  ctx.font='9px Share Tech Mono'; ctx.lineWidth=1;
+  for(let x=Math.floor(wL/sX)*sX;x<=wR+sX*.1;x+=sX){
+    const[px]=w2p(x,0),iz=Math.abs(x)<sX*.01;
+    ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,CH);
+    ctx.strokeStyle=iz?'#1e3040':'#111820';ctx.stroke();
+    if(!iz){const[,ay]=w2p(0,0);ctx.fillStyle='#2a3d50';ctx.fillText(fmtN(x),px+2,Math.min(Math.max(ay+13,10),CH-3));}
+  }
+  for(let y=Math.floor(wB/sY)*sY;y<=wT+sY*.1;y+=sY){
+    const[,py]=w2p(0,y),iz=Math.abs(y)<sY*.01;
+    ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(CW,py);
+    ctx.strokeStyle=iz?'#1e3040':'#111820';ctx.stroke();
+    if(!iz){const[ax]=w2p(0,0);ctx.fillStyle='#2a3d50';ctx.fillText(fmtN(y),Math.min(Math.max(ax+3,3),CW-44),py-3);}
+  }
+  const[ax]=w2p(0,0),[,ay]=w2p(0,0);
+  ctx.strokeStyle='#1e3040';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ax,0);ctx.lineTo(ax,CH);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,ay);ctx.lineTo(CW,ay);ctx.stroke();
+  ctx.lineWidth=1;
+}
+
+function drawPoints(){
+  for(const p of allPoints){
+    const[px,py]=w2p(p.plotX,p.plotY);
+    if(px<-8||px>CW+8||py<-8||py>CH+8) continue;
+    const isSel=(selected===p);
+    ctx.beginPath();ctx.arc(px,py,isSel?9:5,0,Math.PI*2);
+    if(isSel){ctx.shadowBlur=20;ctx.shadowColor='#00ff88';ctx.fillStyle='#00ff88';}
+    else{ctx.shadowBlur=0;
+      // prec=1→green, prec=0.5→blue, prec=0→dark blue
+      let pr=p.prec;
+      let r,g,b2;
+      if(pr>=0.5){
+        // green(0,255,80) → blue(0,80,255) as prec goes 1→0.5
+        const t=(pr-0.5)*2; // 1 at prec=1, 0 at prec=0.5
+        r=0; g=Math.round(80+175*t); b2=Math.round(255-175*t);
+      } else {
+        // blue(0,80,255) → dark blue(0,10,80) as prec goes 0.5→0
+        const t=pr*2; // 1 at prec=0.5, 0 at prec=0
+        r=0; g=Math.round(10+70*t); b2=Math.round(80+175*t);
+      }
+      ctx.fillStyle=`rgba(${r},${g},${b2},0.9)`;}
+    ctx.fill();ctx.shadowBlur=0;
+  }
+}
+
+function drawOriginDot(){
+  const[px,py]=w2p(originX,originZ);
+  ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);
+  ctx.fillStyle='#ff4466';ctx.shadowBlur=16;ctx.shadowColor='#ff4466';
+  ctx.fill();ctx.shadowBlur=0;
+  ctx.strokeStyle='rgba(255,68,102,0.5)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(px-14,py);ctx.lineTo(px+14,py);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px,py-14);ctx.lineTo(px,py+14);ctx.stroke();
+  ctx.lineWidth=1;
+  document.getElementById('oX2').textContent=fmtN(originX);
+  document.getElementById('oZ2').textContent=fmtN(originZ);
+}
+
+// ===== EVENTS =====
+cv.addEventListener('mousedown',e=>{
+  e.preventDefault();isPanning=true;didPan=false;
+  const r=cv.getBoundingClientRect();
+  panStartPx=[e.clientX-r.left,e.clientY-r.top];panStartCam=[camX,camY];
+  cv.style.cursor='grabbing';
+});
+cv.addEventListener('mousemove',e=>{
+  const r=cv.getBoundingClientRect();
+  const px=e.clientX-r.left,py=e.clientY-r.top;
+  const[wx,wy]=p2w(px,py);
+  document.getElementById('ci').textContent=`Cursor: ${fmtN(wx)} , ${fmtN(wy)}`;
+  if(isPanning){
+    const dx=px-panStartPx[0],dy=py-panStartPx[1];
+    if(Math.abs(dx)>3||Math.abs(dy)>3){didPan=true;camX=panStartCam[0]-dx/ppu;camY=panStartCam[1]+dy/ppu;draw();}
+  }
+});
+cv.addEventListener('mouseup',e=>{
+  cv.style.cursor='crosshair';
+  if(!didPan){
+    const r=cv.getBoundingClientRect();
+    const px=e.clientX-r.left,py=e.clientY-r.top;
+    let best=null,bestD=20;
+    for(const p of allPoints){const[ppx,ppy]=w2p(p.plotX,p.plotY);const d=Math.hypot(ppx-px,ppy-py);if(d<bestD){bestD=d;best=p;}}
+    selected=best;if(best)showSelected(best);draw();
+  }
+  isPanning=false;didPan=false;
+});
+cv.addEventListener('mouseleave',()=>{isPanning=false;didPan=false;cv.style.cursor='crosshair';});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const r=cv.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;
+  const[wa,wc]=p2w(mx,my);const f=e.deltaY>0?.8:1.25;
+  ppu=Math.max(.001,Math.min(1e6,ppu*f));camX=wa-(mx-CW/2)/ppu;camY=wc+(my-CH/2)/ppu;draw();
+},{passive:false});
+
+function showSelected(p){
+  document.getElementById('coordX').textContent=fmtN(p.lhsRaw[0]+originX);
+  document.getElementById('coordY').textContent=fmtN(p.lhsRaw[1]+originZ);
+  const pct=(p.prec*100).toFixed(1);
+  document.getElementById('pval').textContent=pct+'%';
+  const bar=document.getElementById('pbar');
+  bar.style.width=pct+'%';
+  bar.style.background=p.prec>.9?'var(--green)':p.prec>.5?'var(--yellow)':'var(--red)';
+
+  function decomp64(val){
+    const v=Math.round(val),q=Math.floor(v/64),r=v%64;
+    if(q===0) return `<span style="color:var(--text);font-size:17px">${v}</span>`;
+    if(r===0) return `<span style="color:var(--text);font-size:17px">${q}</span><span style="color:var(--dim);font-size:14px">×64</span>`;
+    return `<span style="color:var(--text);font-size:17px">${q}</span><span style="color:var(--dim);font-size:14px">×64 + </span><span style="color:var(--text);font-size:17px">${r}</span>`;
+  }
+
+  const coefs=[
+    {name:'A',val:p.A,k:p.kA,label:'free'},
+    {name:'B',val:p.B,k:p.kB,label:'solved'},
+    {name:'C',val:p.C,k:p.kC,label:'free'},
+    {name:'D',val:p.D,k:p.kD,label:'solved'},
+  ];
+  let html='';
+  for(const c of coefs){
+    const kn=c.k; // coef/N = k (integer)
+    html+=`<div style="background:#080c10;border:1px solid var(--border);padding:10px 12px;margin-bottom:5px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <span style="color:var(--dim);font-size:11px;font-weight:bold">${c.name} <span style="font-size:10px;font-weight:normal">(${c.label})</span></span>
+        <span style="color:var(--dim);font-size:10px">${c.name}/n = ${kn}</span>
+      </div>
+      <div style="color:var(--green);font-size:24px;font-weight:bold;line-height:1.1;margin-bottom:5px">${kn}</div>
+      <div style="font-size:16px;font-weight:bold;line-height:1.3">${decomp64(kn)}</div>
+    </div>`;
+  }
+  document.getElementById('coefBlocks').innerHTML=html;
+}
+
+
+// ===== TOUCH SUPPORT =====
+let lastTouchDist=null, lastTouchMid=null;
+cv.addEventListener('touchstart', e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    isPanning=true; didPan=false;
+    const t=e.touches[0];
+    const r=cv.getBoundingClientRect();
+    panStartPx=[t.clientX-r.left, t.clientY-r.top];
+    panStartCam=[camX,camY];
+  } else if(e.touches.length===2){
+    isPanning=false;
+    const r=cv.getBoundingClientRect();
+    const t0=e.touches[0], t1=e.touches[1];
+    lastTouchDist=Math.hypot(t1.clientX-t0.clientX, t1.clientY-t0.clientY);
+    lastTouchMid=[(t0.clientX+t1.clientX)/2-r.left, (t0.clientY+t1.clientY)/2-r.top];
+  }
+},{passive:false});
+
+cv.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  const r=cv.getBoundingClientRect();
+  if(e.touches.length===1 && isPanning){
+    const t=e.touches[0];
+    const px=t.clientX-r.left, py=t.clientY-r.top;
+    const dx=px-panStartPx[0], dy=py-panStartPx[1];
+    if(Math.abs(dx)>2||Math.abs(dy)>2){
+      didPan=true;
+      camX=panStartCam[0]-dx/ppu;
+      camY=panStartCam[1]+dy/ppu;
+      draw();
+    }
+  } else if(e.touches.length===2){
+    const t0=e.touches[0], t1=e.touches[1];
+    const dist=Math.hypot(t1.clientX-t0.clientX, t1.clientY-t0.clientY);
+    const mid=[(t0.clientX+t1.clientX)/2-r.left, (t0.clientY+t1.clientY)/2-r.top];
+    if(lastTouchDist && dist>0){
+      const [wa,wc]=p2w(mid[0],mid[1]);
+      const f=dist/lastTouchDist;
+      ppu=Math.max(0.001,Math.min(1e6,ppu*f));
+      camX=wa-(mid[0]-CW/2)/ppu;
+      camY=wc+(mid[1]-CH/2)/ppu;
+      draw();
+    }
+    lastTouchDist=dist; lastTouchMid=mid;
+  }
+},{passive:false});
+
+cv.addEventListener('touchend', e=>{
+  if(e.touches.length===0){
+    if(!didPan){
+      // tap = select nearest point
+      const r=cv.getBoundingClientRect();
+      const t=e.changedTouches[0];
+      const px=t.clientX-r.left, py=t.clientY-r.top;
+      let best=null,bestD=28;
+      for(const p of allPoints){const[ppx,ppy]=w2p(p.plotX,p.plotY);const d=Math.hypot(ppx-px,ppy-py);if(d<bestD){bestD=d;best=p;}}
+      selected=best; if(best) showSelected(best); draw();
+    }
+    isPanning=false; didPan=false; lastTouchDist=null;
+  } else if(e.touches.length===1){
+    lastTouchDist=null;
+    isPanning=true;
+    const r=cv.getBoundingClientRect();
+    const t=e.touches[0];
+    panStartPx=[t.clientX-r.left, t.clientY-r.top];
+    panStartCam=[camX,camY];
+    didPan=false;
+  }
+},{passive:false});
+
+function openDrawer(){
+  document.getElementById('settingsDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('settingsDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+window.addEventListener('resize',resize);
+resize();
+rebuild();
+</script>
+</body>
+</html>

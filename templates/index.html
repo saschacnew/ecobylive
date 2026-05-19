@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}EcoByLife — Naturlig Skönhet{% endblock %}
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-content">
+        <p class="hero-eyebrow">Naturens egna elixir</p>
+        <h1 class="hero-title">Skönhet från<br><em>naturen</em></h1>
+        <p class="hero-sub">100% veganskt · Cruelty-free · Tillverkat i Sverige</p>
+        <div class="hero-btns">
+            <a href="{{ url_for('catalog') }}" class="btn-primary">Utforska katalogen</a>
+            <a href="{{ url_for('contact') }}" class="btn-outline-light">Kontakta oss</a>
+        </div>
+    </div>
+    <div class="hero-visual">
+        <div class="hero-circle"></div>
+        <div class="hero-leaves">
+            <span class="leaf leaf-1">🌿</span>
+            <span class="leaf leaf-2">🍃</span>
+            <span class="leaf leaf-3">🌱</span>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+<section class="categories-section">
+    <h2 class="section-title">Handla efter kategori</h2>
+    <div class="categories-grid">
+        {% for cat, emoji, desc in [('Skincare','🌸','Naturliga hudvårdsprodukter'),('Makeup','✨','Vegansk & cruelty-free'),('Haircare','🌿','För friskt & starkt hår'),('Fragrance','🌺','Botaniska dofter')] %}
+        <a href="{{ url_for('catalog', category=cat) }}" class="category-card">
+            <div class="cat-emoji">{{ emoji }}</div>
+            <h3>{{ cat }}</h3>
+            <p>{{ desc }}</p>
+            <span class="cat-arrow">→</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="featured-section">
+    <div class="section-header">
+        <h2 class="section-title">Utvalda produkter</h2>
+        <a href="{{ url_for('catalog') }}" class="see-all">Se alla →</a>
+    </div>
+    <div class="products-grid">
+        {% for p in featured %}
+        <div class="product-card">
+            <a href="{{ url_for('product', product_id=p['id']) }}" class="product-img-wrap">
+                {% if p['image'] %}
+                <img src="{{ url_for('static', filename='images/products/' + p['image']) }}" alt="{{ p['name'] }}">
+                {% else %}
+                <div class="product-img-placeholder">
+                    {% if p['category'] == 'Skincare' %}🌸
+                    {% elif p['category'] == 'Makeup' %}✨
+                    {% elif p['category'] == 'Haircare' %}🌿
+                    {% else %}🌺{% endif %}
+                </div>
+                {% endif %}
+                <span class="product-category-tag">{{ p['category'] }}</span>
+            </a>
+            <div class="product-info">
+                <h4><a href="{{ url_for('product', product_id=p['id']) }}">{{ p['name'] }}</a></h4>
+                <p class="product-desc-short">{{ p['description'][:70] }}...</p>
+                <a href="{{ url_for('contact', product=p['id']) }}" class="btn-enquire">Förfrågan →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Values strip -->
+<section class="values-strip">
+    {% for icon, title, text in [('🌿','100% Veganskt','Inga animaliska ingredienser'),('🐰','Cruelty-Free','Aldrig testat på djur'),('♻️','Hållbart','Återvinningsbar förpackning'),('🇸🇪','Gjort i Sverige','Lokalt producerat')] %}
+    <div class="value-item">
+        <span class="value-icon">{{ icon }}</span>
+        <h4>{{ title }}</h4>
+        <p>{{ text }}</p>
+    </div>
+    {% endfor %}
+</section>
+
+<!-- Contact CTA -->
+<section class="cta-section">
+    <div class="cta-inner">
+        <h2>Intresserad av våra produkter?</h2>
+        <p>Skicka en förfrågan så återkommer vi inom 24 timmar.</p>
+        <a href="{{ url_for('contact') }}" class="btn-primary">Kontakta oss</a>
+    </div>
+</section>
+
+{% endblock %}

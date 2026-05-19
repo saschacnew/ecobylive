@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Kontakt — EcoByLife{% endblock %}
+{% block content %}
+
+<section class="contact-section">
+    <div class="contact-grid">
+        <div class="contact-info">
+            <p class="hero-eyebrow">Hör av dig</p>
+            <h1>Kontakta oss</h1>
+            <p class="contact-sub">Har du frågor om våra produkter eller vill lägga en beställning? Fyll i formuläret så återkommer vi inom 24 timmar.</p>
+
+            <div class="contact-details">
+                <div class="contact-detail-item">
+                    <span class="detail-icon">📧</span>
+                    <div>
+                        <h4>E-post</h4>
+                        <p>info@ecobylife.se</p>
+                    </div>
+                </div>
+                <div class="contact-detail-item">
+                    <span class="detail-icon">📍</span>
+                    <div>
+                        <h4>Plats</h4>
+                        <p>Sverige</p>
+                    </div>
+                </div>
+                <div class="contact-detail-item">
+                    <span class="detail-icon">⏰</span>
+                    <div>
+                        <h4>Svarstid</h4>
+                        <p>Inom 24 timmar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-form-wrap">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for msg in messages %}<div class="flash success">{{ msg }}</div>{% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="contact-form">
+                <div class="form-group">
+                    <label>Ditt namn *</label>
+                    <input type="text" name="name" class="form-input" required placeholder="Anna Lindqvist">
+                </div>
+
+                <div class="form-group">
+                    <label>E-postadress *</label>
+                    <input type="email" name="email" class="form-input" required placeholder="anna@exempel.se">
+                </div>
+
+                <div class="form-group">
+                    <label>Produkt (valfritt)</label>
+                    <select name="product_id" class="form-input">
+                        <option value="">— Välj produkt —</option>
+                        {% for p in products %}
+                        <option value="{{ p['id'] }}" {% if preselect and preselect|int == p['id'] %}selected{% endif %}>
+                            {{ p['name'] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Meddelande *</label>
+                    <textarea name="message" class="form-input" rows="5" required
+                              placeholder="Berätta vad du är intresserad av..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary full-width">Skicka meddelande</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

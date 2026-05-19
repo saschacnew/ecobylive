@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EcoByLife{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="logo">EcoByLife</a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('catalog') }}">Katalog</a></li>
+            <li><a href="{{ url_for('catalog', category='Skincare') }}">Skincare</a></li>
+            <li><a href="{{ url_for('catalog', category='Makeup') }}">Makeup</a></li>
+            <li><a href="{{ url_for('catalog', category='Haircare') }}">Haircare</a></li>
+            <li><a href="{{ url_for('catalog', category='Fragrance') }}">Fragrance</a></li>
+            <li><a href="{{ url_for('contact') }}">Kontakt</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="{{ url_for('contact') }}" class="nav-contact-btn">Kontakta oss</a>
+            <button class="hamburger" onclick="toggleNav()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile nav -->
+    <div class="mobile-nav" id="mobileNav">
+        <a href="{{ url_for('catalog') }}">Katalog</a>
+        <a href="{{ url_for('catalog', category='Skincare') }}">Skincare</a>
+        <a href="{{ url_for('catalog', category='Makeup') }}">Makeup</a>
+        <a href="{{ url_for('catalog', category='Haircare') }}">Haircare</a>
+        <a href="{{ url_for('catalog', category='Fragrance') }}">Fragrance</a>
+        <a href="{{ url_for('contact') }}">Kontakt</a>
+    </div>
+
+    <main>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for msg in messages %}
+            <div class="flash">{{ msg }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="logo">EcoByLife</span>
+                <p>Naturlig skönhet från Sverige.<br>100% veganskt & cruelty-free.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Katalog</h4>
+                <a href="{{ url_for('catalog', category='Skincare') }}">Skincare</a>
+                <a href="{{ url_for('catalog', category='Makeup') }}">Makeup</a>
+                <a href="{{ url_for('catalog', category='Haircare') }}">Haircare</a>
+                <a href="{{ url_for('catalog', category='Fragrance') }}">Fragrance</a>
+            </div>
+            <div class="footer-links">
+                <h4>Info</h4>
+                <a href="#">Om oss</a>
+                <a href="#">Hållbarhet</a>
+                <a href="{{ url_for('contact') }}">Kontakt</a>
+                <a href="{{ url_for('admin_login') }}">Admin</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2024 EcoByLife. Alla rättigheter förbehållna.</span>
+        </div>
+    </footer>
+
+    <script>
+    function toggleNav() {
+        document.getElementById('mobileNav').classList.toggle('open');
+    }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

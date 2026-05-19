@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Shop — EcoByLive{% endblock %}
+{% block content %}
+
+<section class="shop-section">
+    <div class="shop-header">
+        <h1>Shop</h1>
+        <p>{{ products|length }} produkter</p>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="category-filter">
+        {% for cat in ['All', 'Skincare', 'Makeup', 'Haircare', 'Fragrance'] %}
+        <a href="{{ url_for('shop', category=cat) }}"
+           class="filter-btn {% if active_category == cat %}active{% endif %}">
+            {{ cat }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid shop-grid">
+        {% for p in products %}
+        <div class="product-card">
+            <a href="{{ url_for('product', product_id=p['id']) }}" class="product-img-wrap">
+                {% if p['image'] %}
+                <img src="{{ url_for('static', filename='images/products/' + p['image']) }}" alt="{{ p['name'] }}">
+                {% else %}
+                <div class="product-img-placeholder">
+                    {% if p['category'] == 'Skincare' %}🌸
+                    {% elif p['category'] == 'Makeup' %}✨
+                    {% elif p['category'] == 'Haircare' %}🌿
+                    {% else %}🌺{% endif %}
+                </div>
+                {% endif %}
+                <span class="product-category-tag">{{ p['category'] }}</span>
+            </a>
+            <div class="product-info">
+                <h4><a href="{{ url_for('product', product_id=p['id']) }}">{{ p['name'] }}</a></h4>
+                <p class="product-desc-short">{{ p['description'][:60] }}...</p>
+                <div class="product-bottom">
+                    <span class="product-price">{{ "%.2f"|format(p['price']) }} kr</span>
+                    <button class="add-to-cart-btn" onclick="addToCart({{ p['id'] }}, '{{ p['name'] }}', {{ p['price'] }})">+</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not products %}
+    <div class="empty-state">
+        <p>Inga produkter i denna kategori ännu.</p>
+        <a href="{{ url_for('shop') }}" class="btn-primary">Se alla produkter</a>
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}

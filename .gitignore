@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+ecobylive.db
+.env
+venv/
+static/images/products/*.jpg
+static/images/products/*.png
+static/images/products/*.webp

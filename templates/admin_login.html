@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login — EcoByLive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="admin-body">
+    <div class="admin-login-wrap">
+        <div class="admin-login-box">
+            <span class="logo">EcoByLive</span>
+            <h2>Admin Panel</h2>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for msg in messages %}<div class="flash error">{{ msg }}</div>{% endfor %}
+            {% endif %}
+            {% endwith %}
+            <form method="POST">
+                <input type="text" name="username" placeholder="Användarnamn" class="form-input" required>
+                <input type="password" name="password" placeholder="Lösenord" class="form-input" required>
+                <button type="submit" class="btn-primary full-width">Logga in</button>
+            </form>
+            <a href="{{ url_for('index') }}" class="back-link">← Tillbaka till butiken</a>
+        </div>
+    </div>
+</body>
+</html>

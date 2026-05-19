@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}{{ product['name'] }} — EcoByLife{% endblock %}
+{% block content %}
+
+<div class="product-detail">
+    <div class="breadcrumb">
+        <a href="{{ url_for('index') }}">Hem</a> /
+        <a href="{{ url_for('catalog', category=product['category']) }}">{{ product['category'] }}</a> /
+        <span>{{ product['name'] }}</span>
+    </div>
+
+    <div class="product-detail-grid">
+        <div class="product-detail-img">
+            {% if product['image'] %}
+            <img src="{{ url_for('static', filename='images/products/' + product['image']) }}" alt="{{ product['name'] }}">
+            {% else %}
+            <div class="product-img-placeholder large">
+                {% if product['category'] == 'Skincare' %}🌸
+                {% elif product['category'] == 'Makeup' %}✨
+                {% elif product['category'] == 'Haircare' %}🌿
+                {% else %}🌺{% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="product-detail-info">
+            <span class="product-category-tag static">{{ product['category'] }}</span>
+            <h1>{{ product['name'] }}</h1>
+            <p class="product-description">{{ product['description'] }}</p>
+
+            <div class="product-badges">
+                <span>🌿 Veganskt</span>
+                <span>🐰 Cruelty-free</span>
+                <span>♻️ Hållbar förpackning</span>
+            </div>
+
+            <div class="enquiry-box">
+                <p>Intresserad av den här produkten?</p>
+                <a href="{{ url_for('contact', product=product['id']) }}" class="btn-primary">Skicka förfrågan</a>
+            </div>
+        </div>
+    </div>
+
+    {% if related %}
+    <div class="related-section">
+        <h2>Liknande produkter</h2>
+        <div class="products-grid">
+            {% for p in related %}
+            <div class="product-card">
+                <a href="{{ url_for('product', product_id=p['id']) }}" class="product-img-wrap">
+                    {% if p['image'] %}
+                    <img src="{{ url_for('static', filename='images/products/' + p['image']) }}" alt="{{ p['name'] }}">
+                    {% else %}
+                    <div class="product-img-placeholder">
+                        {% if p['category'] == 'Skincare' %}🌸{% elif p['category'] == 'Makeup' %}✨{% elif p['category'] == 'Haircare' %}🌿{% else %}🌺{% endif %}
+                    </div>
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <h4><a href="{{ url_for('product', product_id=p['id']) }}">{{ p['name'] }}</a></h4>
+                    <a href="{{ url_for('contact', product=p['id']) }}" class="btn-enquire">Förfrågan →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

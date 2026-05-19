@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Katalog — EcoByLife{% endblock %}
+{% block content %}
+
+<section class="shop-section">
+    <div class="shop-header">
+        <h1>Katalog</h1>
+        <p>{{ products|length }} produkter</p>
+    </div>
+
+    <div class="category-filter">
+        {% for cat in ['All', 'Skincare', 'Makeup', 'Haircare', 'Fragrance'] %}
+        <a href="{{ url_for('catalog', category=cat) }}"
+           class="filter-btn {% if active_category == cat %}active{% endif %}">
+            {{ cat if cat != 'All' else 'Alla' }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <div class="products-grid shop-grid">
+        {% for p in products %}
+        <div class="product-card">
+            <a href="{{ url_for('product', product_id=p['id']) }}" class="product-img-wrap">
+                {% if p['image'] %}
+                <img src="{{ url_for('static', filename='images/products/' + p['image']) }}" alt="{{ p['name'] }}">
+                {% else %}
+                <div class="product-img-placeholder">
+                    {% if p['category'] == 'Skincare' %}🌸
+                    {% elif p['category'] == 'Makeup' %}✨
+                    {% elif p['category'] == 'Haircare' %}🌿
+                    {% else %}🌺{% endif %}
+                </div>
+                {% endif %}
+                <span class="product-category-tag">{{ p['category'] }}</span>
+            </a>
+            <div class="product-info">
+                <h4><a href="{{ url_for('product', product_id=p['id']) }}">{{ p['name'] }}</a></h4>
+                <p class="product-desc-short">{{ p['description'][:70] }}...</p>
+                <a href="{{ url_for('contact', product=p['id']) }}" class="btn-enquire">Förfrågan →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not products %}
+    <div class="empty-state">
+        <p>Inga produkter i denna kategori ännu.</p>
+        <a href="{{ url_for('catalog') }}" class="btn-primary">Se alla produkter</a>
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}
